@@ -1,1 +1,1 @@
-# arab_pangenome_reference
+# Arab Pangenome Reference
