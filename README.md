@@ -11,3 +11,17 @@ Full-Length RNA Sequencing: Delve deeper into the transcriptomic landscape with 
 The data can be found here:
 
 https://www.mbru.ac.ae/the-arab-pangenome-reference/
+
+
+# Analyses Notebooks
+
+There are three main notebooks:
+
+**Plotting pipeline** was used to plot the bandage plots 
+**CSV analysis** was used to analyse complex sites in the pangenome
+**gene analysis** was used to anotate genes in the complex regions
+
+The other notebooks are supplemantary and were used to produce plots and stats for the assembly and the pangenome.
+
+In case of any questions, please open an issue or contact muhammad.kumail@mbru.ac.ae
+
