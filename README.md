@@ -23,5 +23,7 @@ There are three main notebooks:
 
 The other notebooks are supplemantary and were used to produce plots and stats for the assembly and the pangenome.
 
+Since the analyses is being performed on graph pangenome, the run time for each segment of is around 1 minute to produce the sub-gfa files. 
+
 In case of any questions, please open an issue or contact muhammad.kumail@mbru.ac.ae
 
