@@ -88,11 +88,22 @@ You can use the following command once the pipeline is available in your path:
 
 cactus-pangenome ./apr-js-chm13.2908 ./seq_hifiasm.seq --latest --disableCaching --outName apr_review_v1_2902_chm13 --outDir apr_review_v1_2902_chm13 --reference CHM13 GRCh38 --filter 9 --giraffe clip filter --vcf  --chrom-vg clip filter --gbz clip filter full --viz --gfa clip full --vcf --logFile apr-chm13.log --mgCores 160 --mapCores 160 --consCores 160 --indexCores 160 --binariesMode local --workDir work
  
+## Mitochondrial pangenome construction 
 
+To construct a mitochondrial Arab pangenome (mtAPR) that captures the diversity of Arab mitochondrial DNA, we used high-quality long reads from 53 individuals. We first mapped the reads to ChrM of the CHM13v2 reference genome using minimap2 (v2.26)​69​ with 90% similarity and retained only reads that were longer than 15 kb; this threshold was set to substantially reduce the chances of inadvertent nuclear DNA contamination. This resulted in a total of 20,520 reads (19,251 ONT reads and 1,385 HiFi reads). We used PGGB (v0.5.4)​70​ to construct a mitochondrial pangenome graph from the mitochondrial contigs of HiFi reads of all individuals, and each read of >15 kb was concatenated in one fasta file along with the CHM13v2 mitochondrial chromosome. [PGGB](https://github.com/pangenome/pggb) was then run on these samples with the following command: 
+pggb -i pggb.in.90.no_dup.chm13.fasta.gz -o output_chm13_local -n 53 -t 90 -p 90 -s 100 -V 'chm13v2:#:50' 
+
+We visualized the mtAPR graph using Bandage NG version (v2022.09)​67​ and displayed the nodes, edges and variants in different colors and shapes. 
+
+ 
+
+## Mitochondrial pangenome variant identification 
+
+To process the VCF files of the mtAPR pangenome, we employed a multistage approach to ensure data accuracy and integrity. The initial step involved segregation of multiallelic variant sites into biallelic records, which was accomplished using the BCFtools normalization function (BCFtools norm -m). Next, we implemented the RTG tool vcfdecompose (version 3.12.1) with the parameters --break-mnps and --break-indels to further resolve complex variants into their constituent single-nucleotide polymorphisms (SNPs), indels and SVs. To merge genotype information, identical variants identified across the dataset were consolidated into singular records. This step was carried out using a custom Perl script. Parallel to the APR data, the HPRC mitochondrial pangenome VCF file was subjected to the same rigorous processing methodology to maintain consistency across datasets. The small variants (<10 bp) were further filtered to obtain those that were concordant with DeepVariant calls of the mitochondrial reads. To identify novel variants unique to the APR mitochondrial pangenome, we systematically removed variants that were shared with the HPRC mitochondrial pangenome. We then extracted insertions of 10 base pairs or more that were subsequently clustered using the cd-hit-est program, which applied a stringent 90% similarity threshold (-c 0.9) to discern and characterize novel insertions. 
 
 # The data can be found here:
 
-https://www.mbru.ac.ae/the-arab-pangenome-reference/
+[APR](https://www.mbru.ac.ae/the-arab-pangenome-reference/)
 
 
 # Analyses Notebooks
