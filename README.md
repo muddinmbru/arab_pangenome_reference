@@ -48,7 +48,7 @@ Once the QC is complete, the pangenome can be built using the [Minigraph-cactus]
 
 # Panscan
 
-The complex regions in the pangenome were assessed using the Panscan tool. 
+The complex regions in the pangenome were assessed using the [Panscan](https://github.com/muddinmbru/panscan) tool. 
 
 
 The data can be found here:
