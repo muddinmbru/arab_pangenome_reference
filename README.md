@@ -106,17 +106,4 @@ To process the VCF files of the mtAPR pangenome, we employed a multistage approa
 [APR](https://www.mbru.ac.ae/the-arab-pangenome-reference/)
 
 
-# Analyses Notebooks
-
-There are three main notebooks:
-
-**Plotting pipeline** was used to plot the bandage plots 
-**CSV analysis** was used to analyse complex sites in the pangenome
-**gene analysis** was used to anotate genes in the complex regions
-
-The other notebooks are supplemantary and were used to produce plots and stats for the assembly and the pangenome.
-
-Since the analyses is being performed on graph pangenome, the run time for each segment of is around 1 minute to produce the sub-gfa files. 
-
-In case of any questions, please open an issue or contact muhammad.kumail@mbru.ac.ae
 
