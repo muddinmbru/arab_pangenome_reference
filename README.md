@@ -60,7 +60,10 @@ The output of this alignment is a CIGAR string and each contig's alignment to th
  ## PStools
 
 To calculate the Hamming rate and switch errors in assemblies constructed with Hi-C data, we used pstools (v0.1)​30​. The phasing errors were assessed employing the following command: 
+
+```
 pstools phasing_error -t 96 $sample.1.polished.fa $sample.2.polished.fa $sample_r1..20fastq $sample_r2.20.fastq 
+```
 
 ## Flagger
 
@@ -73,7 +76,9 @@ minimap2 --cs -L -Y -t 32 -ax map-hifi $sample.concat.fa.gz $sample.hifi.fq.gz
 Make sure to sort the resulting sam files. [Samtools](https://github.com/samtools/samtools) can be used for that.
 
 Map the individual assemblies to a reference such as [CHM13v2](https://github.com/marbl/CHM13)
-minimap2 -t 64 -L --eqx --cs -ax asm5 chm13v2.0.fa $sample.polished.fa.gz  
+```
+minimap2 -t 64 -L --eqx --cs -ax asm5 chm13v2.0.fa $sample.polished.fa.gz
+```
 
 The output of the previous files can be used in [flagger](https://github.com/mobinasri/flagger)
 
