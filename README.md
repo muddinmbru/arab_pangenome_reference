@@ -13,11 +13,13 @@ Kraken was used to filter out non-human sequences from the assemblies.
 To build the assemblies use Hifiasm (v0.19.5-r603) and run the following command:
 
 If you have HiC data available:
+'''
 hifiasm -o ${sample} --dual-scaf -t128 --ul ${sample}.filtered.ont.fasta --h1 ${sample}_r1.sampled.fastq --h2 ${sample}_r2.sampled.80.fastq ${sample}.filtered.pb.fastq  
-
+'''
 If only Ultra-long and Hifi data is available:
+'''
 hifiasm -o ${sample} -t128 --ul ${sample}.filtered.ont.fasta ${sample}.filtered.pb.fastq 
-
+'''
 Please see for more details:
 https://github.com/chhylp123/hifiasm
 
@@ -26,25 +28,32 @@ https://github.com/chhylp123/hifiasm
 
 ## Quast
 To evaluate the quality and structural integrity of 53 primary assemblies and 106 haplotype assemblies, we used QUAST (v5.2.0)​62​, which provides metrics such as completeness, N50, and number of contigs. QUAST was run with the following extensive parameter set, as detailed: 
-
+'''
 quast.py -o APR043.chm13v2.0 -r chm13v2.0.fa -t 16 APR043.bp.hap1.p_ctg.fa APR043.bp.hap2.p_ctg.fa --large -e 
+'''
 
  
 ## Yak
 The yak suite (v0.1-r66)​24​, which includes yak count, yak qv and yak trioeval, was employed for genome quality validation.  
 
+'''
 yak count -t16 -b37 -o APR043.pb.yak APR043.pb.fastq.gz  
+'''
 
 was first used to build kmer database and yak qv was used to calculate the QV score with the following parameters:  
 
+'''
 -t32 -p -K 3.2g -l 100k APR043.pb.yak APR043.bp.hap1.p_ctg.fa > APR043.hap1.pb.yak.qv.txt 
+'''
 
 
 
 ## Unialigner
 All assembled contigs were aligned to the CHM13v2 reference genome using Minimap2 with -L --eqx option. After successful mapping, the chromosome to which each contig was predominantly aligned was identified for further analysis. The centromeric region corresponding to this chromosome was then extracted from the reference genome using SAMtools faidx. To assess the alignment quality of the assembly contig to the extracted centromeric region, we employed UniAligner​31​, specifically using the tandem_aligner command: 
 
+'''
 tandem_aligner --first chm13v2.chr1.fa --second $sample{}.1.polished.part_h1tg000053l.fa -o ${sample}.1_h1tg000053l_chr1" 
+'''
 
 The output of this alignment is a CIGAR string and each contig's alignment to the centromere of its respective chromosome was further analyzed. A sliding window approach was applied to each CIGAR string, using a window size of 100 base pairs, to calculate the alignment percentage within each window. Finally, the alignment percentages from all windows were plotted to visualize the distribution of alignment quality across different sections of the contigs. 
 
@@ -58,7 +67,9 @@ pstools phasing_error -t 96 $sample.1.polished.fa $sample.2.polished.fa $sample_
 To assess small-scale assembly errors use flagger.
 
 Concatenate the assemblies into one file per sample and map the HiFi reads to the assembly using either [minimap2](https://github.com/lh3/minimap2) or [Winnowmap](https://github.com/marbl/Winnowmap). 
+'''
 minimap2 --cs -L -Y -t 32 -ax map-hifi $sample.concat.fa.gz $sample.hifi.fq.gz 
+'''
 Make sure to sort the resulting sam files. [Samtools](https://github.com/samtools/samtools) can be used for that.
 
 Map the individual assemblies to a reference such as [CHM13v2](https://github.com/marbl/CHM13)
@@ -70,7 +81,9 @@ The output of the previous files can be used in [flagger](https://github.com/mob
 
 We used [Liftoff](https://github.com/agshumate/Liftoff) v1.6.3 (ref.​32​), a tool that accurately maps gene annotations between genome assemblies, to identify gene duplications in our dataset. Liftoff aligns gene sequences from a reference (GENCODE v38) to a target genome and finds the mapping that maximizes sequence identity while preserving the gene structure. An identity threshold of 90% (-sc 0.9) was used, and the following command was used: 
 
+'''
 liftoff -p 64 -sc 0.90 -copies -g GENCODE.V38.gff3 -u unmapped.txt -o gene_dup.gff3 -polish {$ASSEMBLY}  {$REFERENCE} 
+'''
 
 To remove partial matches from the analysis, we used the -exclude_partial option in Liftoff. We then quantitatively assessed the frequency of copy number variations (CNVs) for each gene in the target genome by comparing the number of gene copies to that in the reference (GENCODE GRCh38.p14 (GENCODE v38)). APR-specific gene duplications were compared against HPRC and CPC gene duplication matrices, as reported in studies utilizing similar methodologies and tool versions. We have constructed a downstream analytical tool PanScan (https://github.com/muddinmbru/panscan) for analyses of complex structural variant analysis. Gene duplication analysis and novel sequence estimation from pangenome graph vcf file.  
 
@@ -86,12 +99,16 @@ Once the QC is complete, the pangenome can be built using the [Minigraph-cactus]
 The complex regions in the pangenome were assessed using the [Panscan](https://github.com/muddinmbru/panscan) tool. 
 You can use the following command once the pipeline is available in your path:
 
+'''
 cactus-pangenome ./apr-js-chm13.2908 ./seq_hifiasm.seq --latest --disableCaching --outName apr_review_v1_2902_chm13 --outDir apr_review_v1_2902_chm13 --reference CHM13 GRCh38 --filter 9 --giraffe clip filter --vcf  --chrom-vg clip filter --gbz clip filter full --viz --gfa clip full --vcf --logFile apr-chm13.log --mgCores 160 --mapCores 160 --consCores 160 --indexCores 160 --binariesMode local --workDir work
- 
+'''
+
 ## Mitochondrial pangenome construction 
 
 To construct a mitochondrial Arab pangenome (mtAPR) that captures the diversity of Arab mitochondrial DNA, we used high-quality long reads from 53 individuals. We first mapped the reads to ChrM of the CHM13v2 reference genome using minimap2 (v2.26)​69​ with 90% similarity and retained only reads that were longer than 15 kb; this threshold was set to substantially reduce the chances of inadvertent nuclear DNA contamination. This resulted in a total of 20,520 reads (19,251 ONT reads and 1,385 HiFi reads). We used PGGB (v0.5.4)​70​ to construct a mitochondrial pangenome graph from the mitochondrial contigs of HiFi reads of all individuals, and each read of >15 kb was concatenated in one fasta file along with the CHM13v2 mitochondrial chromosome. [PGGB](https://github.com/pangenome/pggb) was then run on these samples with the following command: 
+'''
 pggb -i pggb.in.90.no_dup.chm13.fasta.gz -o output_chm13_local -n 53 -t 90 -p 90 -s 100 -V 'chm13v2:#:50' 
+'''
 
 We visualized the mtAPR graph using Bandage NG version (v2022.09)​67​ and displayed the nodes, edges and variants in different colors and shapes. 
 
@@ -100,6 +117,11 @@ We visualized the mtAPR graph using Bandage NG version (v2022.09)​67​ and di
 ## Mitochondrial pangenome variant identification 
 
 To process the VCF files of the mtAPR pangenome, we employed a multistage approach to ensure data accuracy and integrity. The initial step involved segregation of multiallelic variant sites into biallelic records, which was accomplished using the BCFtools normalization function (BCFtools norm -m). Next, we implemented the RTG tool vcfdecompose (version 3.12.1) with the parameters --break-mnps and --break-indels to further resolve complex variants into their constituent single-nucleotide polymorphisms (SNPs), indels and SVs. To merge genotype information, identical variants identified across the dataset were consolidated into singular records. This step was carried out using a custom Perl script. Parallel to the APR data, the HPRC mitochondrial pangenome VCF file was subjected to the same rigorous processing methodology to maintain consistency across datasets. The small variants (<10 bp) were further filtered to obtain those that were concordant with DeepVariant calls of the mitochondrial reads. To identify novel variants unique to the APR mitochondrial pangenome, we systematically removed variants that were shared with the HPRC mitochondrial pangenome. We then extracted insertions of 10 base pairs or more that were subsequently clustered using the cd-hit-est program, which applied a stringent 90% similarity threshold (-c 0.9) to discern and characterize novel insertions. 
+
+# Population Structure Analysis
+
+## PCA
+
 
 # The data can be found here:
 
