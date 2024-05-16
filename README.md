@@ -1,7 +1,7 @@
 # Arab Pangenome Reference
 
 
-Comprehensive Resource for the Arab World Delve into the intricate genetic tapestry that defines the Arab people. A Comprehensive Resource for the Arab World built with 106 Assemblies (53 Individuals)
+A Comprehensive Resource for the Arab World built with 106 Assemblies (53 Individuals)
 
 106 Assemblies: Double the insight with assemblies from 53 individuals, ensuring a broad spectrum of genetic representation.
 High-Definition Data: Utilizing 30x HiFi coverage and 50x ONT Ultra-long data, we offer unparalleled depth and accuracy in our genome sequences
@@ -120,8 +120,89 @@ To process the VCF files of the mtAPR pangenome, we employed a multistage approa
 
 # Population Structure Analysis
 
-## PCA
+## ADMIXTURE
 
+To run ADMIXTURE analysis on our cohort by first variant calling it on a set of variants found in the Human Origins array dataset downloaded from the Allen Ancient DNA Resource V54.1.p1 using the command 
+```
+bcftools mpileup -f ${REFGEN} -I -E -T ${VCF} -r chr{i} -b {bam.list} -Ou | bcftools call -Aim -C alleles -T ${TSV} -Oz -o ${OUT} -f GQ
+```
+The joint called APR VCF was merged with a set of 1040 samples from the Human Origins (HO) dataset. The merged file was filtered for genotype quality (GQ) greater than 20, minor allele frequency (MAF) greater than 0.05, and linkage disequilibrium pruning using the following command: 
+```
+plink --bfile data --maf 0.05 --indep-pairwise 50 50 0.5 --make-bed --out file 
+```
+and then ADMIXTURE was run on the filtered file with the following command
+```
+admixture PCA.file.bed {5..9) —cv -j 20
+```
+
+## PCA
+For the PCA we used the R library SNPRelate (v1.28.0). We used the same merged and filtered dataset from the ADMIXTURE methodology above. The Rscript to plot the PCA from the vcf file is provided below
+```R
+library("SNPRelate")
+library("rgl")
+
+vcf1.fn<-"{$merged.vcf}"
+snpgdsVCF2GDS(vcf1.fn, "{$merged.gds}",  method="biallelic.only")
+
+genofile<- openfn.gds("{$merged.gds}")
+ccm_pca<-snpgdsPCA(genofile, num.thread=64)
+
+#Read in your pedigree file showing sample ethnicities for coloring the plot
+PED <- read.table('{$samples.ped}', header = TRUE, skip = 0, sep = '\t')
+PED <- PED[which(PED$Individual.ID %in% ccm_pca$sample.id), ]
+PED <- PED[match(ccm_pca$sample.id, PED$Individual.ID),]
+#Making sure all your samples in the dataset match with the pedigree file
+all(PED$Individual.ID == ccm_pca$sample.id) == TRUE
+
+#Match population ids with colors you want
+PED$Population <- factor(PED$Population, levels=c(
+  "ethnicity1-a","ethnicity1-b","ethnicity1-c",
+  "ethnicity2-a","ethnicity2-b","ethnicity2-c","ethnicity2-d",
+  "ethnicity3-a","ethnicity3-b",
+  ))
+
+col <- colorRampPalette(c(
+  "yellow","yellow","yellow",
+  "forestgreen","forestgreen","forestgreen","forestgreen",'forestgreen','forestgreen','forestgreen','forestgreen',
+  "red","red"))(length(unique(PED$Population)))[factor(PED$Population)]
+
+project.pca <- ccm_pca$eigenvect
+png('pca.png', 1200,1800)
+par(mar=c(11,11,4,1)+.1)
+plot(project.pca[,1], project.pca[,2],
+  type = 'n',
+  main = '',
+  adj = 0.5,
+  xlab = '',
+  ylab = '',
+  cex.xlab= 10,
+  cex.ylab= 10,
+  font = 4,
+  font.lab = 4,
+  cex.lab=4,cex.main=1, cex.axis=2, cex.sub=2)
+points(project.pca[,1], project.pca[,2], col = col, pch = 20, cex = 4)
+legend('topleft',
+  bty = 'n',
+  cex = 3,
+  title = '',
+  c('Ethnicity1', 'Ethnicity2', 'Ethnicity3'),
+  fill = c('yellow' , "forestgreen" , "red"))
+```
+
+##fineSTRUCTURE
+To confirm the unrelated status of all 50 APR samples, we constructed a heatmap using haplotype sharing variance obtained from fineSTRUCTURE​​ runs. The variants called using DeepVariant were filtered for a GQ of ≥20. We then reduced the dataset to one variant per 10 kb window and jointly phased it with Eagle using the following command 
+```
+for i in {1..22}; do
+       eagle --vcfTarget=chr$i.vcf.gz --vcfRef=1000genomes-all-chr-chr$i.vcf.gz --outPrefix=phased_chr$i --geneticMapFile=Eagle_v2.4.1/tables/chrom_genetic_maps/genetic_map_chr$i.txt --numThreads=160 
+done
+```
+The genetic map file was obtained from the website https://alkesgroup.broadinstitute.org/Eagle/ . The resulting phased output is then used to run the fineSTRUCTURE pipeline with the following code
+```
+for i in {1..22}; do plink --vcf all.merge.chr$i.phased.vcf.gz --recode12 --double-id --out FS_chr$i;done
+for i in {1..22}; do plink2chromopainter.pl -p=FS_chr$i.ped -m=FS_chr$i.map -o=FS_chr$i.phasefile;done
+for i in {1..22}; do convertrecfile.pl -M hap FS_chr$i.phasefile ../GENETIC MAP/chr$i.genetic.map FS_chr$i.recombfile;done
+fs FS.cp -v -import FS.settings -go
+```
 
 # The data can be found here:
 
