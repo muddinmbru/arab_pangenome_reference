@@ -169,7 +169,7 @@ PED$Population <- factor(PED$Population, levels=c(
 
 col <- colorRampPalette(c(
   "yellow","yellow","yellow",
-  "forestgreen","forestgreen","forestgreen","forestgreen",'forestgreen','forestgreen','forestgreen','forestgreen',
+  "forestgreen","forestgreen","forestgreen","forestgreen",
   "red","red"))(length(unique(PED$Population)))[factor(PED$Population)]
 
 project.pca <- ccm_pca$eigenvect
