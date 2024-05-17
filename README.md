@@ -5,6 +5,7 @@ A Comprehensive Resource for the Arab World built with 106 Assemblies (53 Indivi
 
 106 Assemblies: Double the insight with assemblies from 53 individuals, ensuring a broad spectrum of genetic representation.
 High-Definition Data: Utilizing 30x HiFi coverage and 50x ONT Ultra-long data, we offer unparalleled depth and accuracy in our genome sequences
+18 samples with high-coverage Hi-C data. 
 
 # Data filtering and QC
 Kraken was used to filter out non-human sequences from the assemblies.
