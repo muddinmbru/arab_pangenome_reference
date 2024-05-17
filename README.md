@@ -96,17 +96,17 @@ To remove partial matches from the analysis, we used the -exclude_partial option
 # Pangenome
 
 Once the QC is complete, the pangenome can be built using the [Minigraph-cactus](https://github.com/ComparativeGenomicsToolkit/cactus/blob/master/doc/pangenome.md) pipeline. 
-
-
-
-# Panscan
-
-The complex regions in the pangenome were assessed using the [Panscan](https://github.com/muddinmbru/panscan) tool. 
 You can use the following command once the pipeline is available in your path:
 
 ```
 cactus-pangenome ./apr-js-chm13.2908 ./seq_hifiasm.seq --latest --disableCaching --outName apr_review_v1_2902_chm13 --outDir apr_review_v1_2902_chm13 --reference CHM13 GRCh38 --filter 9 --giraffe clip filter --vcf  --chrom-vg clip filter --gbz clip filter full --viz --gfa clip full --vcf --logFile apr-chm13.log --mgCores 160 --mapCores 160 --consCores 160 --indexCores 160 --binariesMode local --workDir work
 ```
+
+
+# Panscan
+
+The complex regions in the pangenome were assessed using the [Panscan](https://github.com/muddinmbru/panscan) tool. 
+
 
 ## Mitochondrial pangenome construction 
 
