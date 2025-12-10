@@ -195,7 +195,7 @@ legend('topleft',
   fill = c('yellow' , "forestgreen" , "red"))
 ```
 
-##fineSTRUCTURE
+## fineSTRUCTURE
 To confirm the unrelated status of all 50 APR samples, we constructed a heatmap using haplotype sharing variance obtained from fineSTRUCTURE​​ runs. The variants called using DeepVariant were filtered for a GQ of ≥20. We then reduced the dataset to one variant per 10 kb window and jointly phased it with Eagle using the following command 
 ```
 for i in {1..22}; do
